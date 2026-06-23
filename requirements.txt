@@ -5,7 +5,8 @@ requests==2.31.0
 python-dotenv==1.0.0
 schedule==1.2.1
 edge-tts==6.1.9
-moviepy==2.0.0
+moviepy==1.0.3
+numpy==1.26.4
 Pillow==10.3.0
 setuptools==75.0.0
 google-api-python-client==2.126.0
