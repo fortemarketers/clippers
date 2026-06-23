@@ -5,10 +5,9 @@ requests==2.31.0
 python-dotenv==1.0.0
 schedule==1.2.1
 edge-tts==6.1.9
-moviepy==1.0.3
+moviepy==2.0.0
 Pillow==10.3.0
-imageio==2.34.1
-imageio-ffmpeg==0.4.9
+setuptools==75.0.0
 google-api-python-client==2.126.0
 google-auth-oauthlib==1.2.0
 google-auth-httplib2==0.2.0
