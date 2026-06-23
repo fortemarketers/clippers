@@ -1,6 +1,6 @@
 import os
 import logging
-import numpy as np
+import subprocess
 
 logger = logging.getLogger(__name__)
 
@@ -8,22 +8,37 @@ logger = logging.getLogger(__name__)
 def generate_voiceover(script: str, voice: str, rate: str, output_path: str) -> str:
     os.makedirs(os.path.dirname(output_path) if os.path.dirname(output_path) else ".", exist_ok=True)
 
+    # Try piper-tts (lightweight, good quality)
     try:
-        from kokoro import KPipeline
-        import soundfile as sf
-        logger.info("Using Kokoro TTS...")
-        pipeline = KPipeline(lang_code='a')
-        kokoro_voice = {"en-US-GuyNeural": "am_adam", "en-US-ChristopherNeural": "am_michael",
-                        "en-US-EricNeural": "am_echo", "en-US-BrianNeural": "am_liam"}.get(voice, "am_adam")
-        chunks = []
-        for _, _, audio in pipeline(script, voice=kokoro_voice, speed=1.2):
-            chunks.append(audio)
-        if chunks:
-            sf.write(output_path, np.concatenate(chunks), 24000)
-            logger.info(f"Kokoro voiceover saved: {output_path}")
+        import urllib.request
+        model_path = "/tmp/piper_en_us.onnx"
+        config_path = "/tmp/piper_en_us.onnx.json"
+        if not os.path.exists(model_path):
+            logger.info("Downloading Piper model...")
+            urllib.request.urlretrieve(
+                "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/high/en_US-ryan-high.onnx",
+                model_path
+            )
+            urllib.request.urlretrieve(
+                "https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/ryan/high/en_US-ryan-high.onnx.json",
+                config_path
+            )
+        wav_path = output_path.replace('.mp3', '.wav')
+        result = subprocess.run(
+            ['piper', '--model', model_path, '--output_file', wav_path],
+            input=script.encode(),
+            capture_output=True,
+            timeout=60
+        )
+        if result.returncode == 0 and os.path.exists(wav_path):
+            subprocess.run(['ffmpeg', '-i', wav_path, '-codec:a', 'libmp3lame',
+                          '-qscale:a', '2', output_path, '-y'],
+                         capture_output=True)
+            os.remove(wav_path)
+            logger.info(f"Piper voiceover saved: {output_path}")
             return output_path
     except Exception as e:
-        logger.warning(f"Kokoro failed: {e} — using gTTS")
+        logger.warning(f"Piper failed: {e} — using gTTS")
 
     from gtts import gTTS
     tts = gTTS(text=script, lang='en', slow=False)
