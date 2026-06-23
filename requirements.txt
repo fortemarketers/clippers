@@ -16,5 +16,4 @@ aiohttp==3.9.5
 colorlog==6.8.2
 gtts==2.5.1
 pyttsx3==2.90
-kokoro==0.9.4
-soundfile==0.12.1
+piper-tts==1.2.0
