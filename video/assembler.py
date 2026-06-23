@@ -1,9 +1,7 @@
 import os
 import random
 import logging
-from moviepy import VideoFileClip, AudioFileClip, TextClip, CompositeVideoClip, ColorClip, concatenate_videoclips
-from core.config import VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_FPS, BACKGROUNDS_DIR
-
+from moviepy.editor import VideoFileClip, AudioFileClip, TextClip, CompositeVideoClip, ColorClip, concatenate_videoclipsfrom core.config import VIDEO_WIDTH, VIDEO_HEIGHT, VIDEO_FPS, BACKGROUNDS_DIR
 logger = logging.getLogger(__name__)
 
 
